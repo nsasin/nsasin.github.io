@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Losowanie nazwisk</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; margin-top: 50px; }
+    button { padding: 10px 20px; font-size: 18px; margin: 5px; }
+    .result { margin-top: 30px; font-size: 28px; font-weight: bold; color: #007bff; transition: 0.3s; }
+    .used { margin-top: 20px; color: gray; font-size: 14px; }
+  </style>
+</head>
+<body>
+
+  <h1>Losowanie nazwisk</h1>
+  <button onclick="drawName()">Wylosuj</button>
+  <button onclick="resetDrawing()">Resetuj losowanie</button>
+  <div class="result" id="result"></div>
+  <div class="used" id="used"></div>
+
+  <script>
+    const allNames = ['Norbert', 'Piotr', 'Artur', 'Andrzej'];
+    let usedNames = JSON.parse(localStorage.getItem('usedNames')) || [];
+
+    function drawName() {
+      // Jeśli wszystko już było, resetujemy i losujemy od nowa
+      if (usedNames.length >= allNames.length) {
+        usedNames = [];
+        localStorage.setItem('usedNames', JSON.stringify(usedNames));
+        document.getElementById('result').textContent = "Wszyscy już byli, zaczynamy od nowa!";
+        setTimeout(drawName, 1500); // automatycznie losuje po chwili
+        return;
+      }
+
+      const remaining = allNames.filter(name => !usedNames.includes(name));
+      const randomIndex = Math.floor(Math.random() * remaining.length);
+      const drawn = remaining[randomIndex];
+
+      usedNames.push(drawn);
+      localStorage.setItem('usedNames', JSON.stringify(usedNames));
+
+      const resultEl = document.getElementById('result');
+      resultEl.textContent = `Wylosowano: ${drawn}`;
+      resultEl.style.backgroundColor = '#e0f0ff';
+      resultEl.style.padding = '10px';
+      resultEl.style.borderRadius = '10px';
+
+      document.getElementById('used').textContent = `Wylosowani do tej pory: ${usedNames.join(', ')}`;
+    }
+
+    function resetDrawing() {
+      localStorage.removeItem('usedNames');
+      usedNames = [];
+      document.getElementById('result').textContent = 'Losowanie zresetowane.';
+      document.getElementById('used').textContent = 'Jeszcze nikogo nie wylosowano.';
+    }
+
+    // Pokazujemy wcześniej zapisanych wylosowanych
+    document.getElementById('used').textContent = usedNames.length > 0
+      ? `Wylosowani do tej pory: ${usedNames.join(', ')}`
+      : "Jeszcze nikogo nie wylosowano.";
+  </script>
+
+</body>
+</html>
