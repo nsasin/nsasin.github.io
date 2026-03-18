@@ -42,8 +42,30 @@
     .subtitle {
       color: var(--muted);
       font-size: 0.9rem;
-      margin-bottom: 36px;
+      margin-bottom: 8px;
     }
+
+    .sync-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 500px;
+      margin-bottom: 24px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .sync-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #22c55e;
+      display: inline-block;
+      margin-right: 6px;
+    }
+    .sync-dot.saving { background: var(--accent); }
+    .sync-dot.err    { background: var(--accent2); }
 
     .card {
       background: var(--surface);
@@ -132,6 +154,14 @@
       flex: 1;
     }
     .btn-secondary:hover { color: var(--text); border-color: var(--muted); }
+
+    .btn-danger {
+      background: var(--surface2);
+      color: var(--accent2);
+      border: 1px solid var(--border);
+      flex: 1;
+    }
+    .btn-danger:hover { border-color: var(--accent2); }
 
     .input-row {
       display: flex;
@@ -245,6 +275,30 @@
       padding: 16px 0;
     }
 
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      color: var(--text);
+      padding: 5px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .history-item:last-child { border-bottom: none; }
+
+    .history-meta {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
     .error-shake {
       animation: shake 0.4s ease;
       border-color: var(--accent2) !important;
@@ -261,12 +315,22 @@
       50% { transform: scale(1.1); }
       100% { transform: scale(1); }
     }
+
+    /* scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--surface); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
   </style>
 </head>
 <body>
 
   <h1>Losowanie</h1>
   <p class="subtitle">Kolejność liniowa · bez powtórzeń</p>
+
+  <div class="sync-bar">
+    <span><span class="sync-dot" id="sync-dot"></span><span id="sync-status">Łączenie...</span></span>
+    <span id="sync-time"></span>
+  </div>
 
   <div class="result-box">
     <div class="result-name" id="result-name">—</div>
@@ -275,48 +339,99 @@
 
   <div class="btn-row">
     <button class="btn-primary" onclick="drawName()">▶ Wylosuj</button>
-    <button class="btn-secondary" onclick="resetDrawing()">↺ Resetuj</button>
+    <button class="btn-secondary" onclick="resetDrawing()">↺ Resetuj cykl</button>
+    <button class="btn-danger" onclick="clearMemory()">⊗ Wyczyść</button>
   </div>
 
   <div class="card">
     <div class="card-title">Lista uczestników</div>
-
     <div class="input-row">
       <input type="text" id="new-name" placeholder="Wpisz nowe imię…" onkeydown="if(event.key==='Enter') addName()">
       <button class="btn-add" onclick="addName()">+ Dodaj</button>
     </div>
-
     <div class="name-list" id="name-list"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Historia losowania</div>
+    <div class="history-list" id="history-list">
+      <div class="empty-msg">Brak historii</div>
+    </div>
   </div>
 
   <script>
     const DEFAULT_NAMES = ['Norbert', 'Artur', 'Piotr', 'Andrzej'];
+    const STORAGE_KEY = 'losowanie_v1';
 
-    function load() {
-      return {
-        names:      JSON.parse(localStorage.getItem('ln_names'))    || [...DEFAULT_NAMES],
-        excluded:   JSON.parse(localStorage.getItem('ln_excluded')) || [],
-        index:      parseInt(localStorage.getItem('ln_index'))      || 0,
-        drawn:      parseInt(localStorage.getItem('ln_drawn'))      || 0
-      };
+    let s = { names: [...DEFAULT_NAMES], excluded: [], index: 0, drawn: 0, cycle: 1, history: [] };
+    let isSaving = false;
+
+    /* ---- Storage (IndexedDB jako fallback gdy brak window.storage) ---- */
+    function hasSharedStorage() {
+      return typeof window.storage !== 'undefined';
     }
 
-    function save() {
-      localStorage.setItem('ln_names',    JSON.stringify(s.names));
-      localStorage.setItem('ln_excluded', JSON.stringify(s.excluded));
-      localStorage.setItem('ln_index',    s.index);
-      localStorage.setItem('ln_drawn',    s.drawn);
+    async function persist() {
+      isSaving = true;
+      setSyncStatus('saving');
+      try {
+        if (hasSharedStorage()) {
+          await window.storage.set(STORAGE_KEY, JSON.stringify(s), true);
+        } else {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+        }
+        setSyncStatus('ok');
+      } catch(e) {
+        // fallback do localStorage
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch(_) {}
+        setSyncStatus('err');
+      }
+      isSaving = false;
     }
 
-    let s = load();
+    async function loadFromStorage() {
+      try {
+        let data = null;
+        if (hasSharedStorage()) {
+          const r = await window.storage.get(STORAGE_KEY, true);
+          if (r && r.value) data = JSON.parse(r.value);
+        } else {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) data = JSON.parse(raw);
+        }
+        if (data) {
+          s = Object.assign({ names: [...DEFAULT_NAMES], excluded: [], index: 0, drawn: 0, cycle: 1, history: [] }, data);
+        }
+        setSyncStatus('ok');
+      } catch(e) {
+        setSyncStatus('err');
+      }
+      render();
+      restoreResultDisplay();
+    }
 
+    function setSyncStatus(state) {
+      const dot = document.getElementById('sync-dot');
+      const txt = document.getElementById('sync-status');
+      const time = document.getElementById('sync-time');
+      dot.className = 'sync-dot' + (state === 'err' ? ' err' : state === 'saving' ? ' saving' : '');
+      if (state === 'ok') {
+        txt.textContent = hasSharedStorage() ? 'Zsynchronizowano' : 'Zapisano lokalnie';
+        time.textContent = new Date().toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      } else if (state === 'saving') {
+        txt.textContent = 'Zapisywanie…';
+      } else {
+        txt.textContent = 'Błąd – dane lokalne';
+      }
+    }
+
+    /* ---- Logika ---- */
     function active() {
       return s.names.filter(n => !s.excluded.includes(n));
     }
 
-    // Znajdź kolejny nieykluczony indeks startując od fromIdx
     function nextIdx(fromIdx) {
-      if (s.names.length === 0) return -1;
+      if (!s.names.length) return -1;
       for (let i = 0; i < s.names.length; i++) {
         const idx = (fromIdx + i) % s.names.length;
         if (!s.excluded.includes(s.names[idx])) return idx;
@@ -326,30 +441,30 @@
 
     function drawName() {
       const act = active();
-      if (act.length === 0) {
+      if (!act.length) {
         document.getElementById('result-name').textContent = '—';
         document.getElementById('result-sub').textContent = 'Brak aktywnych uczestników!';
         return;
       }
-
       if (s.drawn >= act.length) {
         s.drawn = 0;
+        s.cycle++;
         s.index = nextIdx(0);
-        save();
+        persist();
         document.getElementById('result-name').textContent = '↺';
         document.getElementById('result-sub').textContent = 'Wszyscy byli! Zaczynamy od nowa…';
-        renderList();
+        render();
         setTimeout(drawName, 1200);
         return;
       }
-
       const idx = nextIdx(s.index);
       if (idx === -1) return;
-
       const drawn = s.names[idx];
       s.index = (idx + 1) % s.names.length;
       s.drawn++;
-      save();
+      s.history.unshift({ name: drawn, cycle: s.cycle, time: new Date().toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' }) });
+      if (s.history.length > 60) s.history.pop();
+      persist();
 
       const nameEl = document.getElementById('result-name');
       nameEl.textContent = drawn;
@@ -361,23 +476,37 @@
       document.getElementById('result-sub').textContent =
         remaining > 0 ? `Pozostało w cyklu: ${remaining}` : 'Wszyscy zostali wylosowani';
 
-      renderList();
+      render();
     }
 
     function resetDrawing() {
-      s.index = 0;
       s.drawn = 0;
-      save();
+      s.index = 0;
+      s.cycle++;
+      persist();
       document.getElementById('result-name').textContent = '—';
-      document.getElementById('result-sub').textContent = 'Naciśnij „Wylosuj" aby rozpocząć';
-      renderList();
+      document.getElementById('result-sub').textContent = 'Cykl zresetowany – zaczynam od Norberta';
+      render();
+    }
+
+    async function clearMemory() {
+      if (!confirm('Wyczyścić całą pamięć? (historia, lista, stan kolejki)')) return;
+      s = { names: [...DEFAULT_NAMES], excluded: [], index: 0, drawn: 0, cycle: 1, history: [] };
+      try {
+        if (hasSharedStorage()) await window.storage.delete(STORAGE_KEY, true);
+        localStorage.removeItem(STORAGE_KEY);
+      } catch(e) {}
+      document.getElementById('result-name').textContent = '—';
+      document.getElementById('result-sub').textContent = 'Pamięć wyczyszczona';
+      setSyncStatus('ok');
+      render();
     }
 
     function addName() {
       const input = document.getElementById('new-name');
       const name = input.value.trim();
       if (!name) return;
-      if (s.names.map(n=>n.toLowerCase()).includes(name.toLowerCase())) {
+      if (s.names.map(n => n.toLowerCase()).includes(name.toLowerCase())) {
         input.classList.remove('error-shake');
         void input.offsetWidth;
         input.classList.add('error-shake');
@@ -385,42 +514,38 @@
         return;
       }
       s.names.push(name);
-      save();
+      persist();
       input.value = '';
-      renderList();
+      render();
     }
 
     function deleteName(name) {
-      const wasIdx = s.names.indexOf(name);
+      const wi = s.names.indexOf(name);
       s.names = s.names.filter(n => n !== name);
       s.excluded = s.excluded.filter(n => n !== name);
-      if (wasIdx < s.index) s.index = Math.max(0, s.index - 1);
+      if (wi < s.index) s.index = Math.max(0, s.index - 1);
       if (s.index >= s.names.length) s.index = 0;
       const act = active();
       if (s.drawn > act.length) s.drawn = act.length;
-      save();
-      renderList();
+      persist(); render();
     }
 
     function toggleExclude(name) {
-      if (s.excluded.includes(name)) {
-        s.excluded = s.excluded.filter(n => n !== name);
-      } else {
-        s.excluded.push(name);
-      }
+      if (s.excluded.includes(name)) s.excluded = s.excluded.filter(n => n !== name);
+      else s.excluded.push(name);
       const act = active();
       if (s.drawn > act.length) s.drawn = act.length;
-      save();
+      persist(); render();
+    }
+
+    function render() {
       renderList();
+      renderHistory();
     }
 
     function renderList() {
       const list = document.getElementById('name-list');
-      if (s.names.length === 0) {
-        list.innerHTML = '<div class="empty-msg">Brak uczestników. Dodaj kogoś powyżej.</div>';
-        return;
-      }
-
+      if (!s.names.length) { list.innerHTML = '<div class="empty-msg">Brak uczestników. Dodaj kogoś powyżej.</div>'; return; }
       const act = active();
       const nxtIdx = nextIdx(s.index < s.names.length ? s.index : 0);
       const nxtName = nxtIdx !== -1 ? s.names[nxtIdx] : null;
@@ -432,34 +557,49 @@
         const wasDone = !isExcl && actPos !== -1 && actPos < s.drawn;
 
         let badge = '';
-        if (isExcl)        badge = '<span class="badge badge-excl">pominięty</span>';
-        else if (isNext)   badge = '<span class="badge badge-next">następny</span>';
-        else if (wasDone)  badge = '<span class="badge badge-done">✓ był</span>';
+        if (isExcl)       badge = '<span class="badge badge-excl">pominięty</span>';
+        else if (isNext)  badge = '<span class="badge badge-next">następny</span>';
+        else if (wasDone) badge = '<span class="badge badge-done">✓ był</span>';
 
         const safe = name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-
         return `
           <div class="name-item ${isExcl ? 'excluded' : ''} ${isNext ? 'is-next' : ''}">
             <div class="name-avatar">${name[0].toUpperCase()}</div>
             <span class="name-label">${name}</span>
             ${badge}
             <button class="btn-icon" title="${isExcl ? 'Włącz do losowania' : 'Wyklucz z losowania'}"
-              onclick="toggleExclude('${safe}')">
-              ${isExcl ? '👁' : '🚫'}
-            </button>
+              onclick="toggleExclude('${safe}')">${isExcl ? '👁' : '🚫'}</button>
             <button class="btn-icon danger" title="Usuń z listy"
               onclick="deleteName('${safe}')">✕</button>
           </div>`;
       }).join('');
     }
 
-    renderList();
-    if (s.drawn > 0) {
-      const act = active();
-      const remaining = act.length - s.drawn;
-      document.getElementById('result-sub').textContent =
-        remaining > 0 ? `Pozostało w cyklu: ${remaining}` : 'Wszyscy zostali wylosowani';
+    function renderHistory() {
+      const el = document.getElementById('history-list');
+      if (!s.history || !s.history.length) { el.innerHTML = '<div class="empty-msg">Brak historii</div>'; return; }
+      el.innerHTML = s.history.map(h => `
+        <div class="history-item">
+          <span>${h.name}</span>
+          <span class="history-meta">Cykl ${h.cycle} · ${h.time}</span>
+        </div>`).join('');
     }
+
+    function restoreResultDisplay() {
+      if (s.history && s.history.length > 0) {
+        const last = s.history[0];
+        document.getElementById('result-name').textContent = last.name;
+        const act = active();
+        const remaining = act.length - s.drawn;
+        document.getElementById('result-sub').textContent =
+          remaining > 0 ? `Pozostało w cyklu: ${remaining}` : 'Wszyscy zostali wylosowani';
+      }
+    }
+
+    /* ---- Init ---- */
+    loadFromStorage();
+    // Odświeżaj co 8 sekund gdy shared storage dostępny
+    setInterval(() => { if (!isSaving && hasSharedStorage()) loadFromStorage(); }, 8000);
   </script>
 
 </body>
