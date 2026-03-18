@@ -16,307 +16,63 @@
       --border: #2e2e3e;
       --radius: 12px;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       font-family: 'DM Sans', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 40px 16px;
+      background: var(--bg); color: var(--text);
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; padding: 40px 16px;
     }
-
-    h1 {
-      font-family: 'Syne', sans-serif;
-      font-size: 2.2rem;
-      font-weight: 800;
-      letter-spacing: -1px;
-      color: var(--accent);
-      margin-bottom: 8px;
-    }
-
-    .subtitle {
-      color: var(--muted);
-      font-size: 0.9rem;
-      margin-bottom: 8px;
-    }
-
-    .sync-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      width: 100%;
-      max-width: 500px;
-      margin-bottom: 24px;
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .sync-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #22c55e;
-      display: inline-block;
-      margin-right: 6px;
-    }
+    h1 { font-family: 'Syne', sans-serif; font-size: 2.2rem; font-weight: 800; letter-spacing: -1px; color: var(--accent); margin-bottom: 8px; }
+    .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 8px; }
+    .sync-bar { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 500px; margin-bottom: 24px; font-size: 12px; color: var(--muted); }
+    .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; display: inline-block; margin-right: 6px; transition: background 0.3s; }
     .sync-dot.saving { background: var(--accent); }
     .sync-dot.err    { background: var(--accent2); }
-
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 24px;
-      width: 100%;
-      max-width: 500px;
-      margin-bottom: 20px;
-    }
-
-    .card-title {
-      font-family: 'Syne', sans-serif;
-      font-size: 0.75rem;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 16px;
-    }
-
-    .result-box {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 28px;
-      width: 100%;
-      max-width: 500px;
-      text-align: center;
-      margin-bottom: 20px;
-      min-height: 120px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .result-name {
-      font-family: 'Syne', sans-serif;
-      font-size: 2.6rem;
-      font-weight: 800;
-      color: var(--accent);
-      letter-spacing: -1px;
-      transition: all 0.3s;
-    }
-
-    .result-sub {
-      font-size: 0.85rem;
-      color: var(--muted);
-    }
-
-    .btn-row {
-      display: flex;
-      gap: 10px;
-      width: 100%;
-      max-width: 500px;
-      margin-bottom: 20px;
-    }
-
-    button {
-      font-family: 'DM Sans', sans-serif;
-      border: none;
-      border-radius: var(--radius);
-      cursor: pointer;
-      font-size: 0.95rem;
-      font-weight: 500;
-      padding: 12px 20px;
-      transition: all 0.15s;
-    }
-
-    .btn-primary {
-      background: var(--accent);
-      color: #111;
-      flex: 2;
-      font-weight: 700;
-      font-size: 1rem;
-    }
+    .sync-dot.offline{ background: var(--muted); }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; width: 100%; max-width: 500px; margin-bottom: 20px; }
+    .card-title { font-family: 'Syne', sans-serif; font-size: 0.75rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+    .result-box { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; width: 100%; max-width: 500px; text-align: center; margin-bottom: 20px; min-height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
+    .result-name { font-family: 'Syne', sans-serif; font-size: 2.6rem; font-weight: 800; color: var(--accent); letter-spacing: -1px; transition: all 0.3s; }
+    .result-sub { font-size: 0.85rem; color: var(--muted); }
+    .btn-row { display: flex; gap: 10px; width: 100%; max-width: 500px; margin-bottom: 20px; }
+    button { font-family: 'DM Sans', sans-serif; border: none; border-radius: var(--radius); cursor: pointer; font-size: 0.95rem; font-weight: 500; padding: 12px 20px; transition: all 0.15s; }
+    .btn-primary { background: var(--accent); color: #111; flex: 2; font-weight: 700; font-size: 1rem; }
     .btn-primary:hover { background: #ffd060; transform: translateY(-1px); }
     .btn-primary:active { transform: translateY(0); }
-
-    .btn-secondary {
-      background: var(--surface2);
-      color: var(--muted);
-      border: 1px solid var(--border);
-      flex: 1;
-    }
+    .btn-secondary { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); flex: 1; }
     .btn-secondary:hover { color: var(--text); border-color: var(--muted); }
-
-    .btn-danger {
-      background: var(--surface2);
-      color: var(--accent2);
-      border: 1px solid var(--border);
-      flex: 1;
-    }
+    .btn-danger { background: var(--surface2); color: var(--accent2); border: 1px solid var(--border); flex: 1; }
     .btn-danger:hover { border-color: var(--accent2); }
-
-    .input-row {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
-    input[type="text"] {
-      flex: 1;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.95rem;
-      padding: 10px 14px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
+    .input-row { display: flex; gap: 8px; margin-bottom: 16px; }
+    input[type="text"] { flex: 1; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.95rem; padding: 10px 14px; outline: none; transition: border-color 0.2s; }
     input[type="text"]:focus { border-color: var(--accent); }
     input[type="text"]::placeholder { color: var(--muted); }
-
-    .btn-add {
-      background: var(--accent);
-      color: #111;
-      font-weight: 700;
-      padding: 10px 18px;
-      border-radius: var(--radius);
-      white-space: nowrap;
-    }
+    .btn-add { background: var(--accent); color: #111; font-weight: 700; padding: 10px 18px; border-radius: var(--radius); white-space: nowrap; }
     .btn-add:hover { background: #ffd060; }
-
-    .name-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .name-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px 14px;
-      transition: all 0.2s;
-    }
-
-    .name-item.excluded {
-      opacity: 0.45;
-      border-style: dashed;
-    }
-
-    .name-item.is-next {
-      border-color: var(--accent);
-      background: rgba(240,192,64,0.07);
-    }
-
-    .name-avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: #111;
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 0.85rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .name-item.excluded .name-avatar {
-      background: var(--surface);
-      color: var(--muted);
-    }
-
+    .name-list { display: flex; flex-direction: column; gap: 8px; }
+    .name-item { display: flex; align-items: center; gap: 10px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; transition: all 0.2s; }
+    .name-item.excluded { opacity: 0.45; border-style: dashed; }
+    .name-item.is-next  { border-color: var(--accent); background: rgba(240,192,64,0.07); }
+    .name-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: #111; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .name-item.excluded .name-avatar { background: var(--surface); color: var(--muted); }
     .name-label { flex: 1; font-size: 0.95rem; }
-
-    .badge {
-      font-size: 0.7rem;
-      border-radius: 4px;
-      padding: 2px 6px;
-      font-weight: 500;
-    }
+    .badge { font-size: 0.7rem; border-radius: 4px; padding: 2px 6px; font-weight: 500; }
     .badge-next { background: rgba(240,192,64,0.15); color: var(--accent); }
     .badge-done { background: rgba(122,122,144,0.15); color: var(--muted); }
     .badge-excl { background: rgba(224,90,90,0.12); color: var(--accent2); }
-
-    .btn-icon {
-      background: none;
-      border: none;
-      color: var(--muted);
-      font-size: 1rem;
-      padding: 4px 6px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.15s;
-      line-height: 1;
-    }
+    .btn-icon { background: none; border: none; color: var(--muted); font-size: 1rem; padding: 4px 6px; border-radius: 6px; cursor: pointer; transition: all 0.15s; line-height: 1; }
     .btn-icon:hover { background: var(--surface); color: var(--text); }
     .btn-icon.danger:hover { color: var(--accent2); }
-
-    .empty-msg {
-      color: var(--muted);
-      font-size: 0.9rem;
-      text-align: center;
-      padding: 16px 0;
-    }
-
-    .history-list {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      max-height: 200px;
-      overflow-y: auto;
-    }
-
-    .history-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.85rem;
-      color: var(--text);
-      padding: 5px 0;
-      border-bottom: 1px solid var(--border);
-    }
+    .empty-msg { color: var(--muted); font-size: 0.9rem; text-align: center; padding: 16px 0; }
+    .history-list { display: flex; flex-direction: column; gap: 4px; max-height: 200px; overflow-y: auto; }
+    .history-item { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: var(--text); padding: 5px 0; border-bottom: 1px solid var(--border); }
     .history-item:last-child { border-bottom: none; }
-
-    .history-meta {
-      font-size: 0.75rem;
-      color: var(--muted);
-    }
-
-    .error-shake {
-      animation: shake 0.4s ease;
-      border-color: var(--accent2) !important;
-    }
-    @keyframes shake {
-      0%,100% { transform: translateX(0); }
-      25% { transform: translateX(-6px); }
-      75% { transform: translateX(6px); }
-    }
-
+    .history-meta { font-size: 0.75rem; color: var(--muted); }
+    .error-shake { animation: shake 0.4s ease; border-color: var(--accent2) !important; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
     .flash { animation: flash 0.4s ease; }
-    @keyframes flash {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-      100% { transform: scale(1); }
-    }
-
-    /* scrollbar */
+    @keyframes flash { 0%{transform:scale(1)} 50%{transform:scale(1.1)} 100%{transform:scale(1)} }
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: var(--surface); }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
@@ -328,7 +84,7 @@
   <p class="subtitle">Kolejność liniowa · bez powtórzeń</p>
 
   <div class="sync-bar">
-    <span><span class="sync-dot" id="sync-dot"></span><span id="sync-status">Łączenie...</span></span>
+    <span><span class="sync-dot offline" id="sync-dot"></span><span id="sync-status">Łączenie z bazą…</span></span>
     <span id="sync-time"></span>
   </div>
 
@@ -338,16 +94,16 @@
   </div>
 
   <div class="btn-row">
-    <button class="btn-primary" onclick="drawName()">▶ Wylosuj</button>
-    <button class="btn-secondary" onclick="resetDrawing()">↺ Resetuj cykl</button>
-    <button class="btn-danger" onclick="clearMemory()">⊗ Wyczyść</button>
+    <button class="btn-primary" id="btn-draw">▶ Wylosuj</button>
+    <button class="btn-secondary" id="btn-reset">↺ Resetuj cykl</button>
+    <button class="btn-danger" id="btn-clear">⊗ Wyczyść</button>
   </div>
 
   <div class="card">
     <div class="card-title">Lista uczestników</div>
     <div class="input-row">
-      <input type="text" id="new-name" placeholder="Wpisz nowe imię…" onkeydown="if(event.key==='Enter') addName()">
-      <button class="btn-add" onclick="addName()">+ Dodaj</button>
+      <input type="text" id="new-name" placeholder="Wpisz nowe imię…">
+      <button class="btn-add" id="btn-add">+ Dodaj</button>
     </div>
     <div class="name-list" id="name-list"></div>
   </div>
@@ -359,86 +115,60 @@
     </div>
   </div>
 
-  <script>
+  <script type="module">
+    import { initializeApp }                    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, set, onValue }   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const app   = initializeApp({ databaseURL: "https://asysty-default-rtdb.europe-west1.firebasedatabase.app" });
+    const db    = getDatabase(app);
+    const dbRef = ref(db, 'losowanie');
+
     const DEFAULT_NAMES = ['Norbert', 'Artur', 'Piotr', 'Andrzej'];
-    const STORAGE_KEY = 'losowanie_v1';
-
     let s = { names: [...DEFAULT_NAMES], excluded: [], index: 0, drawn: 0, cycle: 1, history: [] };
-    let isSaving = false;
+    let ignoreNext = false;
 
-    /* ---- Storage (IndexedDB jako fallback gdy brak window.storage) ---- */
-    function hasSharedStorage() {
-      return typeof window.storage !== 'undefined';
-    }
+    /* ---- helpers ---- */
+    function active() { return s.names.filter(n => !s.excluded.includes(n)); }
 
-    async function persist() {
-      isSaving = true;
-      setSyncStatus('saving');
-      try {
-        if (hasSharedStorage()) {
-          await window.storage.set(STORAGE_KEY, JSON.stringify(s), true);
-        } else {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
-        }
-        setSyncStatus('ok');
-      } catch(e) {
-        // fallback do localStorage
-        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch(_) {}
-        setSyncStatus('err');
-      }
-      isSaving = false;
-    }
-
-    async function loadFromStorage() {
-      try {
-        let data = null;
-        if (hasSharedStorage()) {
-          const r = await window.storage.get(STORAGE_KEY, true);
-          if (r && r.value) data = JSON.parse(r.value);
-        } else {
-          const raw = localStorage.getItem(STORAGE_KEY);
-          if (raw) data = JSON.parse(raw);
-        }
-        if (data) {
-          s = Object.assign({ names: [...DEFAULT_NAMES], excluded: [], index: 0, drawn: 0, cycle: 1, history: [] }, data);
-        }
-        setSyncStatus('ok');
-      } catch(e) {
-        setSyncStatus('err');
-      }
-      render();
-      restoreResultDisplay();
-    }
-
-    function setSyncStatus(state) {
-      const dot = document.getElementById('sync-dot');
-      const txt = document.getElementById('sync-status');
-      const time = document.getElementById('sync-time');
-      dot.className = 'sync-dot' + (state === 'err' ? ' err' : state === 'saving' ? ' saving' : '');
-      if (state === 'ok') {
-        txt.textContent = hasSharedStorage() ? 'Zsynchronizowano' : 'Zapisano lokalnie';
-        time.textContent = new Date().toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      } else if (state === 'saving') {
-        txt.textContent = 'Zapisywanie…';
-      } else {
-        txt.textContent = 'Błąd – dane lokalne';
-      }
-    }
-
-    /* ---- Logika ---- */
-    function active() {
-      return s.names.filter(n => !s.excluded.includes(n));
-    }
-
-    function nextIdx(fromIdx) {
+    function nextIdx(from) {
       if (!s.names.length) return -1;
       for (let i = 0; i < s.names.length; i++) {
-        const idx = (fromIdx + i) % s.names.length;
+        const idx = (from + i) % s.names.length;
         if (!s.excluded.includes(s.names[idx])) return idx;
       }
       return -1;
     }
 
+    /* ---- sync status ---- */
+    function setSyncStatus(state, label) {
+      document.getElementById('sync-dot').className = 'sync-dot' + (state === 'err' ? ' err' : state === 'saving' ? ' saving' : state === 'offline' ? ' offline' : '');
+      document.getElementById('sync-status').textContent = label;
+      if (state === 'ok') document.getElementById('sync-time').textContent =
+        new Date().toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+
+    /* ---- persist ---- */
+    function persist() {
+      setSyncStatus('saving', 'Zapisywanie…');
+      ignoreNext = true;
+      set(dbRef, s)
+        .then(() => setSyncStatus('ok', 'Zsynchronizowano'))
+        .catch(() => setSyncStatus('err', 'Błąd zapisu'));
+    }
+
+    /* ---- listen for remote changes ---- */
+    onValue(dbRef, snapshot => {
+      if (ignoreNext) { ignoreNext = false; return; }
+      const data = snapshot.val();
+      if (data) {
+        s = Object.assign({ names: [...DEFAULT_NAMES], excluded: [], index: 0, drawn: 0, cycle: 1, history: [] }, data);
+        restoreResultDisplay();
+        render();
+      }
+      setSyncStatus('ok', 'Zsynchronizowano');
+    }, () => setSyncStatus('err', 'Błąd połączenia'));
+
+    /* ---- actions ---- */
     function drawName() {
       const act = active();
       if (!act.length) {
@@ -447,8 +177,7 @@
         return;
       }
       if (s.drawn >= act.length) {
-        s.drawn = 0;
-        s.cycle++;
+        s.drawn = 0; s.cycle++;
         s.index = nextIdx(0);
         persist();
         document.getElementById('result-name').textContent = '↺';
@@ -462,6 +191,7 @@
       const drawn = s.names[idx];
       s.index = (idx + 1) % s.names.length;
       s.drawn++;
+      s.history = s.history || [];
       s.history.unshift({ name: drawn, cycle: s.cycle, time: new Date().toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' }) });
       if (s.history.length > 60) s.history.pop();
       persist();
@@ -475,36 +205,29 @@
       const remaining = act.length - s.drawn;
       document.getElementById('result-sub').textContent =
         remaining > 0 ? `Pozostało w cyklu: ${remaining}` : 'Wszyscy zostali wylosowani';
-
       render();
     }
 
     function resetDrawing() {
-      s.drawn = 0;
-      s.index = 0;
-      s.cycle++;
+      s.drawn = 0; s.index = 0; s.cycle++;
       persist();
       document.getElementById('result-name').textContent = '—';
       document.getElementById('result-sub').textContent = 'Cykl zresetowany – zaczynam od Norberta';
       render();
     }
 
-    async function clearMemory() {
+    function clearMemory() {
       if (!confirm('Wyczyścić całą pamięć? (historia, lista, stan kolejki)')) return;
       s = { names: [...DEFAULT_NAMES], excluded: [], index: 0, drawn: 0, cycle: 1, history: [] };
-      try {
-        if (hasSharedStorage()) await window.storage.delete(STORAGE_KEY, true);
-        localStorage.removeItem(STORAGE_KEY);
-      } catch(e) {}
+      persist();
       document.getElementById('result-name').textContent = '—';
       document.getElementById('result-sub').textContent = 'Pamięć wyczyszczona';
-      setSyncStatus('ok');
       render();
     }
 
     function addName() {
       const input = document.getElementById('new-name');
-      const name = input.value.trim();
+      const name  = input.value.trim();
       if (!name) return;
       if (s.names.map(n => n.toLowerCase()).includes(name.toLowerCase())) {
         input.classList.remove('error-shake');
@@ -514,65 +237,79 @@
         return;
       }
       s.names.push(name);
-      persist();
-      input.value = '';
-      render();
+      persist(); input.value = ''; render();
     }
 
     function deleteName(name) {
       const wi = s.names.indexOf(name);
-      s.names = s.names.filter(n => n !== name);
+      s.names    = s.names.filter(n => n !== name);
       s.excluded = s.excluded.filter(n => n !== name);
       if (wi < s.index) s.index = Math.max(0, s.index - 1);
       if (s.index >= s.names.length) s.index = 0;
-      const act = active();
-      if (s.drawn > act.length) s.drawn = act.length;
+      if (s.drawn > active().length) s.drawn = active().length;
       persist(); render();
     }
 
     function toggleExclude(name) {
       if (s.excluded.includes(name)) s.excluded = s.excluded.filter(n => n !== name);
       else s.excluded.push(name);
-      const act = active();
-      if (s.drawn > act.length) s.drawn = act.length;
+      if (s.drawn > active().length) s.drawn = active().length;
       persist(); render();
     }
 
-    function render() {
-      renderList();
-      renderHistory();
-    }
+    /* ---- render ---- */
+    function render() { renderList(); renderHistory(); }
 
     function renderList() {
       const list = document.getElementById('name-list');
-      if (!s.names.length) { list.innerHTML = '<div class="empty-msg">Brak uczestników. Dodaj kogoś powyżej.</div>'; return; }
+      if (!s.names.length) { list.innerHTML = '<div class="empty-msg">Brak uczestników.</div>'; return; }
       const act = active();
-      const nxtIdx = nextIdx(s.index < s.names.length ? s.index : 0);
-      const nxtName = nxtIdx !== -1 ? s.names[nxtIdx] : null;
+      const ni  = nextIdx(s.index < s.names.length ? s.index : 0);
+      const nxtName = ni !== -1 ? s.names[ni] : null;
 
-      list.innerHTML = s.names.map(name => {
+      // czyść i buduj elementy przez DOM (bez onclick w stringu)
+      list.innerHTML = '';
+      s.names.forEach(name => {
         const isExcl  = s.excluded.includes(name);
         const isNext  = name === nxtName && !isExcl && s.drawn < act.length;
         const actPos  = act.indexOf(name);
         const wasDone = !isExcl && actPos !== -1 && actPos < s.drawn;
 
-        let badge = '';
-        if (isExcl)       badge = '<span class="badge badge-excl">pominięty</span>';
-        else if (isNext)  badge = '<span class="badge badge-next">następny</span>';
-        else if (wasDone) badge = '<span class="badge badge-done">✓ był</span>';
+        const item = document.createElement('div');
+        item.className = 'name-item' + (isExcl ? ' excluded' : '') + (isNext ? ' is-next' : '');
 
-        const safe = name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-        return `
-          <div class="name-item ${isExcl ? 'excluded' : ''} ${isNext ? 'is-next' : ''}">
-            <div class="name-avatar">${name[0].toUpperCase()}</div>
-            <span class="name-label">${name}</span>
-            ${badge}
-            <button class="btn-icon" title="${isExcl ? 'Włącz do losowania' : 'Wyklucz z losowania'}"
-              onclick="toggleExclude('${safe}')">${isExcl ? '👁' : '🚫'}</button>
-            <button class="btn-icon danger" title="Usuń z listy"
-              onclick="deleteName('${safe}')">✕</button>
-          </div>`;
-      }).join('');
+        const avatar = document.createElement('div');
+        avatar.className = 'name-avatar';
+        avatar.textContent = name[0].toUpperCase();
+
+        const label = document.createElement('span');
+        label.className = 'name-label';
+        label.textContent = name;
+
+        let badgeEl = null;
+        if (isExcl || isNext || wasDone) {
+          badgeEl = document.createElement('span');
+          badgeEl.className = 'badge ' + (isExcl ? 'badge-excl' : isNext ? 'badge-next' : 'badge-done');
+          badgeEl.textContent = isExcl ? 'pominięty' : isNext ? 'następny' : '✓ był';
+        }
+
+        const btnExcl = document.createElement('button');
+        btnExcl.className = 'btn-icon';
+        btnExcl.title = isExcl ? 'Włącz' : 'Wyklucz';
+        btnExcl.textContent = isExcl ? '👁' : '🚫';
+        btnExcl.addEventListener('click', () => toggleExclude(name));
+
+        const btnDel = document.createElement('button');
+        btnDel.className = 'btn-icon danger';
+        btnDel.title = 'Usuń';
+        btnDel.textContent = '✕';
+        btnDel.addEventListener('click', () => deleteName(name));
+
+        item.append(avatar, label);
+        if (badgeEl) item.appendChild(badgeEl);
+        item.append(btnExcl, btnDel);
+        list.appendChild(item);
+      });
     }
 
     function renderHistory() {
@@ -587,8 +324,7 @@
 
     function restoreResultDisplay() {
       if (s.history && s.history.length > 0) {
-        const last = s.history[0];
-        document.getElementById('result-name').textContent = last.name;
+        document.getElementById('result-name').textContent = s.history[0].name;
         const act = active();
         const remaining = act.length - s.drawn;
         document.getElementById('result-sub').textContent =
@@ -596,10 +332,12 @@
       }
     }
 
-    /* ---- Init ---- */
-    loadFromStorage();
-    // Odświeżaj co 8 sekund gdy shared storage dostępny
-    setInterval(() => { if (!isSaving && hasSharedStorage()) loadFromStorage(); }, 8000);
+    /* ---- event listeners ---- */
+    document.getElementById('btn-draw').addEventListener('click', drawName);
+    document.getElementById('btn-reset').addEventListener('click', resetDrawing);
+    document.getElementById('btn-clear').addEventListener('click', clearMemory);
+    document.getElementById('btn-add').addEventListener('click', addName);
+    document.getElementById('new-name').addEventListener('keydown', e => { if (e.key === 'Enter') addName(); });
   </script>
 
 </body>
